@@ -94,10 +94,10 @@ func (a *App) InstallCaddyfile(c echo.Context, caddyfile_content string) (bool, 
 
 	a.Log.Info("installing caddyfile per user request...")
 	caddyfile_content = string(caddyfile.Format([]byte(caddyfile_content)))
-	os.WriteFile(ConfigAutosavePath, []byte(caddyfile_content), os.ModePerm)
+	os.WriteFile(ConfigAutosavePath, []byte(caddyfile_content), 0644)
 
 	if a.ConfPath != "" {
-		os.WriteFile(a.ConfPath, []byte(caddyfile_content), os.ModePerm)
+		os.WriteFile(a.ConfPath, []byte(caddyfile_content), 0644)
 	}
 
 	return true, caddy.Load([]byte(adaptationResult.Body), false)
