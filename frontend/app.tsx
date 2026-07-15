@@ -1,4 +1,4 @@
-import type { App } from '@/gotypes';
+import type { App, LivenessStatus, UpstreamStatus } from '@/gotypes';
 import Client from '@/spark/client';
 import '@/spark/debug';
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -10,7 +10,8 @@ import { installCaddyfileLang } from './caddyfile-lang';
 import { monaco, Monaco } from './components/Monaco';
 import { preferenceSignal, ThemeToggle } from './spark/themes';
 import { css } from './spark/util';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { useDialog, DialogHeader } from './components/Dialog';
 
 export const client = Client<App>('/rpc/')
 
@@ -110,11 +111,85 @@ async function handleCaddyfileImport() {
 	});
 }
 
+function LivenessDialog({ visible, onClose }: { visible: boolean, onClose: () => void }) {
+	const [statuses, setStatuses] = useState<LivenessStatus[]>([]);
+	const [loading, setLoading] = useState(false);
+	const { Dialog, open, close } = useDialog();
+
+	useEffect(() => {
+		if (visible) {
+			open();
+			fetchLiveness();
+		} else {
+			close();
+		}
+	}, [visible]);
+
+	async function fetchLiveness() {
+		setLoading(true);
+		try {
+			// @ts-ignore
+			const result = await client.Liveness();
+			setStatuses(result || []);
+		} catch (e) {
+			console.error("Failed to fetch liveness", e);
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	return (
+		<Dialog>
+			<div class={`bg-${preferenceSignal.value} p-3 rounded h-100 d-flex flex-column`} style={{minHeight: '300px'}}>
+				<DialogHeader close={onClose}>Liveness Status</DialogHeader>
+				<div class="flex-grow-1 mt-3" style={{overflowY: 'auto'}}>
+					{loading ? (
+						<div class="d-flex justify-content-center align-items-center h-100">
+							<div class="spinner-border text-primary" role="status">
+								<span class="visually-hidden">Loading...</span>
+							</div>
+						</div>
+					) : statuses.length === 0 ? (
+						<div class="text-center text-muted">No reverse proxies found.</div>
+					) : (
+						<ul class="list-group">
+							{statuses.map(status => (
+								<li class={`list-group-item bg-${preferenceSignal.value} text-${preferenceSignal.value === 'dark' ? 'light' : 'dark'}`}>
+									<h5 class="mb-2">{status.host}</h5>
+									<ul class="list-group list-group-flush">
+										{status.upstreams?.map(u => (
+											<li class={`list-group-item d-flex justify-content-between align-items-center bg-${preferenceSignal.value} text-${preferenceSignal.value === 'dark' ? 'light' : 'dark'} border-0 px-0 py-1`}>
+												<span>{u.address}</span>
+												<span class={`badge bg-${u.up ? 'success' : 'danger'} rounded-pill`}>
+													{u.up ? 'UP' : 'DOWN'}
+												</span>
+												{!u.up && u.error && (
+													<small class="text-danger ms-2">{u.error}</small>
+												)}
+											</li>
+										))}
+									</ul>
+								</li>
+							))}
+						</ul>
+					)}
+				</div>
+				<div class="mt-3 text-end">
+					<button class="btn btn-primary btn-sm" onClick={fetchLiveness} disabled={loading}>
+						<i class="fa-solid fa-rotate-right me-1"></i> Refresh
+					</button>
+				</div>
+			</div>
+		</Dialog>
+	);
+}
+
 function App() {
 
 	const currentConfig = useSignal('');
 	const initContent = useSignal('');
 	const editor = useRef<editor.IStandaloneCodeEditor>();
+	const showLiveness = useSignal(false);
 
 	useEffect(() => {
 		client.LastCaddyfile().then(v => initContent.value = v).catch(() => void(0));
@@ -167,9 +242,14 @@ function App() {
 						<i title="Restore last known Caddyfile" class="fa-solid fa-rotate-left square clickable" />
 					</button>
 
+					<button class="bg-transparent border-0" onClick={() => showLiveness.value = true}>
+						<i title="Show Liveness Status" class="fa-solid fa-heart-pulse square clickable" />
+					</button>
+
 					<ThemeToggle />
 				</div>
 			</div>
+			<LivenessDialog visible={showLiveness.value} onClose={() => showLiveness.value = false} />
 		</div>
 	)
 }
