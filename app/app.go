@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig"
@@ -14,11 +15,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// todo: global rw mutex? since there can be multiple admin_panels running
-
 type App struct {
 	Log      *zap.Logger
 	ConfPath string
+	mu       sync.RWMutex
 }
 
 var AppStruct = &App{}
@@ -33,6 +33,9 @@ type AdaptResult struct {
 var ConfigAutosavePath = filepath.Join(caddy.AppConfigDir(), "autosave.Caddyfile")
 
 func (a *App) LastCaddyfile(c echo.Context) (string, error) {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
 	path := ConfigAutosavePath
 
 	if a.ConfPath != "" {
@@ -91,6 +94,9 @@ func (a *App) InstallCaddyfile(c echo.Context, caddyfile_content string) (bool, 
 	if adaptationResult.AdaptError != "" {
 		return false, fmt.Errorf("adapt failed: %s", adaptationResult.AdaptError)
 	}
+
+	a.mu.Lock()
+	defer a.mu.Unlock()
 
 	a.Log.Info("installing caddyfile per user request...")
 	caddyfile_content = string(caddyfile.Format([]byte(caddyfile_content)))
