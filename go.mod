@@ -1,4 +1,4 @@
-module github.com/Complexicon/caddyfile-editor
+module github.com/fl8s/caddyfile-editor
 
 go 1.25.0
 
