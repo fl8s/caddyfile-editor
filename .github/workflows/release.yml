@@ -43,7 +43,7 @@ jobs:
 
       - name: Build Caddy with Plugin (Linux AMD64)
         run: |
-          xcaddy build --with github.com/Complexicon/caddyfile-editor=./ \
+          xcaddy build --with github.com/fl8s/caddyfile-editor=./ \
             --output caddy-linux-amd64
         env:
           CGO_ENABLED: 0
@@ -52,7 +52,7 @@ jobs:
 
       - name: Build Caddy with Plugin (Windows AMD64)
         run: |
-          xcaddy build --with github.com/Complexicon/caddyfile-editor=./ \
+          xcaddy build --with github.com/fl8s/caddyfile-editor=./ \
             --output caddy-windows-amd64.exe
         env:
           CGO_ENABLED: 0
@@ -61,7 +61,7 @@ jobs:
 
       - name: Build Caddy with Plugin (macOS AMD64)
         run: |
-          xcaddy build --with github.com/Complexicon/caddyfile-editor=./ \
+          xcaddy build --with github.com/fl8s/caddyfile-editor=./ \
             --output caddy-darwin-amd64
         env:
           CGO_ENABLED: 0
@@ -70,7 +70,7 @@ jobs:
 
       - name: Build Caddy with Plugin (macOS ARM64)
         run: |
-          xcaddy build --with github.com/Complexicon/caddyfile-editor=./ \
+          xcaddy build --with github.com/fl8s/caddyfile-editor=./ \
             --output caddy-darwin-arm64
         env:
           CGO_ENABLED: 0
@@ -79,7 +79,7 @@ jobs:
 
       - name: Build Caddy with Plugin (Linux ARM64)
         run: |
-          xcaddy build --with github.com/Complexicon/caddyfile-editor=./ \
+          xcaddy build --with github.com/fl8s/caddyfile-editor=./ \
             --output caddy-linux-arm64
         env:
           CGO_ENABLED: 0

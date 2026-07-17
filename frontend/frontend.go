@@ -5,7 +5,7 @@ import (
 	"io/fs"
 	"net/http"
 
-	"github.com/Complexicon/caddyfile-editor/app"
+	"github.com/fl8s/caddyfile-editor/app"
 )
 
 //go:generate bun spark/bundler --prod

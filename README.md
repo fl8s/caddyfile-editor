@@ -32,7 +32,7 @@ The easiest way to build Caddy with the caddyfile-editor plugin is using `xcaddy
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
 # Build Caddy with the caddyfile-editor plugin
-xcaddy build --with github.com/Complexicon/caddyfile-editor@<version>
+xcaddy build --with github.com/fl8s/caddyfile-editor@<version>
 ```
 
 This will create a caddy binary in your current directory with the plugin included.
@@ -43,10 +43,10 @@ If you want to build from this repository directly:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Complexicon/caddyfile-editor.git
+git clone https://github.com/fl8s/caddyfile-editor.git
 cd caddyfile-editor
 
-xcaddy build --with github.com/Complexicon/caddyfile-editor=./
+xcaddy build --with github.com/fl8s/caddyfile-editor=./
 
 # or for development purposes
 go generate ./...

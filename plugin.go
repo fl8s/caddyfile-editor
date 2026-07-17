@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Complexicon/caddyfile-editor/app"
-	"github.com/Complexicon/caddyfile-editor/frontend"
+	"github.com/fl8s/caddyfile-editor/app"
+	"github.com/fl8s/caddyfile-editor/frontend"
 	"go.uber.org/zap"
 
 	"github.com/caddyserver/caddy/v2"
